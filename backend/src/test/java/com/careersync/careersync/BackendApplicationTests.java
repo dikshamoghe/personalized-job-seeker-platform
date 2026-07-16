@@ -1,4 +1,4 @@
-package com.careersync;
+package com.careersync.careersync;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

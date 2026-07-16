@@ -1,7 +1,9 @@
 package com.careersync.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.io.Decoders;
@@ -11,12 +13,17 @@ import java.security.Key;
 
 import java.util.Date;
 
+import static javax.crypto.Cipher.SECRET_KEY;
+
 
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY ="VGhpc0lzQVNlY3JldEtleUZvckNhcmVlclN5bmNBcHBsaWNhdGlvbjEyMzQ1Njc4OTA=";
+    @Value("${jwt.secret}")
+    private String secret;
 
+    @Value("${jwt.expiration}")
+    private long expiration;
     public String generateToken(String email) {
 
         return Jwts.builder()
@@ -28,7 +35,24 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public String extractEmail(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public boolean validateToken(String token, String email) {
+        String extractedEmail = extractEmail(token);
+        return extractedEmail.equals(email)
+                && extractAllClaims(token).getExpiration().after(new Date());
     }
 }

@@ -5,6 +5,8 @@ import com.careersync.dto.LoginResponse;
 import com.careersync.entities.User;
 import com.careersync.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +37,17 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id){
         return userService.getUserById(id);
+    }
+
+    @GetMapping("/profile")
+    public User profile() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+        return userService.getUserByEmail(email);
+
+//        return authentication.getName();
     }
 
 }

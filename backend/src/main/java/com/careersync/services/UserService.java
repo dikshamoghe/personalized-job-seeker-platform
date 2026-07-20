@@ -11,4 +11,5 @@ public interface UserService {
     User getUserById(Long id);
     User registerUser(User user);
     LoginResponse loginUser(LoginRequest loginRequest);
+    User getUserByEmail(String email);
 }

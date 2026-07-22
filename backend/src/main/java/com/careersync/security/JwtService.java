@@ -51,8 +51,9 @@ public class JwtService {
     }
 
     public boolean validateToken(String token, String email) {
-        String extractedEmail = extractEmail(token);
-        return extractedEmail.equals(email)
-                && extractAllClaims(token).getExpiration().after(new Date());
+        Claims claims = extractAllClaims(token);
+
+        return claims.getSubject().equals(email)
+                && claims.getExpiration().after(new Date());
     }
 }

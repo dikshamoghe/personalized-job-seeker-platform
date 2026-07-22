@@ -11,6 +11,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.JwtException;
+
 import java.io.IOException;
 
 @Component
@@ -29,10 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-    	 System.out.println("========== JWT FILTER ==========");
-    	    System.out.println("URI: " + request.getRequestURI());
-    	    System.out.println("Method: " + request.getMethod());
-    	    System.out.println("Authorization: " + request.getHeader("Authorization"));
+    	 
         //
         String authHeader = request.getHeader("Authorization");
 
@@ -42,6 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        
+        try {
         String jwtToken = authHeader.substring(7);
 
         String email = jwtService.extractEmail(jwtToken);
@@ -67,6 +68,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("Invalid JWT Token: " + e.getMessage());
+        }
+
 
         // Temporary until we implement JWT authentication
         filterChain.doFilter(request, response);

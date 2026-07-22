@@ -3,6 +3,7 @@ package com.careersync.services;
 import com.careersync.dto.LoginRequest;
 import com.careersync.dto.LoginResponse;
 import com.careersync.entities.User;
+import com.careersync.exception.UserNotFoundException;
 import com.careersync.repository.UserRepo;
 import com.careersync.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserById(Long id){
-        return userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
     }
 
